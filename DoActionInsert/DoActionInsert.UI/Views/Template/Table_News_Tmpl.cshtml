@@ -1,0 +1,26 @@
+﻿@using DoActionInsert.UI.Models
+@using Incoding.MvcContrib
+@{
+    using (var template = Html.Incoding().Template<NewsVm>())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Create Dt</th>
+                    <th>Content</th>                    
+                </tr>
+            </thead>          
+            @using (var each = template.ForEach())
+            {
+                <tbody>
+                    <tr>
+                        <td>@each.For(r => r.CreateDt) </td>
+                        <td>@each.For(r => r.Content) </td>                                                                
+                    </tr>
+                </tbody>
+            }
+          
+        </table>
+    }
+
+}

@@ -1,0 +1,43 @@
+﻿@using DoActionInsert.UI.Models
+@using Incoding.MvcContrib
+@model TableContactTmpl
+@{
+    using (var template = Html.Incoding().Template<ContactVm>())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th></th>                    
+                </tr>
+            </thead>          
+            @using (var each = template.ForEach())
+            {
+                <tbody>
+                    <tr>
+                        <td>@each.For(r => r.First) / @each.For(r => r.Last) </td>
+                        <td>
+                            @if (Model.IsShowInfo)
+                            {
+                                @(Html.When(JqueryBind.Click)
+                                      .Do()
+                                      .AjaxGet(Url.Action("FetchContactById", "Data", new { id = each.For(r => r.Id) }))
+                                      .OnSuccess(dsl =>
+                                                     {
+                                                         dsl.With(r => r.Name<ContactVm>(s => s.Last)).Core().Insert.For<ContactVm>(r => r.Last).Val();
+                                                         dsl.With(r => r.Name<ContactVm>(s => s.First)).Core().Insert.For<ContactVm>(r => r.First).Val();
+                                                         dsl.With(r => r.Name<ContactVm>(s => s.City)).Core().Insert.For<ContactVm>(r => r.City).Val();
+                                                     })
+                                      .AsHtmlAttributes()
+                                      .ToButton("Show info"))
+                            }
+                        </td>                        
+                        
+                    </tr>
+                </tbody>
+            }
+          
+        </table>
+    }
+
+}

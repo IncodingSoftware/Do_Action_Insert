@@ -1,0 +1,84 @@
+@using DoActionInsert.UI.Models
+@using Incoding.MvcContrib
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    
+    <div>
+        <h3>Direct</h3>            
+        @(Html.When(JqueryBind.InitIncoding)
+              .Do()
+              .Direct(IncodingResult.Success(@<text>
+                                                  <div>Direct content</div>
+                                              </text>))
+              .OnSuccess(dsl => dsl.Self().Core().Insert.Html())
+              .AsHtmlAttributes()
+              .ToDiv())                    
+    </div>      
+    <div>
+        <h3>Action ajax</h3>            
+        @(Html.When(JqueryBind.InitIncoding)
+              .Do()
+              .Ajax(options =>
+                        {
+                            options.Url = Url.Action("Contact", "Data");
+                            options.Type = HttpVerbs.Get;
+                        })
+              .OnSuccess(dsl => dsl.Self().Core().Insert.Html())
+              .AsHtmlAttributes()
+              .ToDiv())                    
+    </div>
+
+    <div>
+        <h3>Generic insert</h3>    
+        <div class="row">
+            <div class="col-lg-4">
+                @(Html.When(JqueryBind.InitIncoding)
+                      .Do()
+                      .AjaxGet(Url.Action("FetchContacts", "Data"))
+                      .OnSuccess(dsl =>
+                                     {
+                                         string asTmpl = Url.Dispatcher()
+                                                            .Model(new TableContactTmpl { IsShowInfo = true })
+                                                            .AsView("~/Views/Template/Table_Contact_Tmpl.cshtml");
+                                         dsl.Self().Core().Insert.WithTemplateByUrl(asTmpl).Html();
+                                     })
+                      .AsHtmlAttributes()
+                      .ToDiv())
+            </div>
+            <div class="col-lg-4">
+                @Html.Partial("Contact", new ContactVm())   
+            </div>
+        </div>                    
+    </div>
+
+    <div>
+        <h3>Generic insert with template</h3>    
+        @{
+            string newsContainerId = Guid.NewGuid().ToString();
+            string contactContainerId = Guid.NewGuid().ToString();
+        }
+        @(Html.When(JqueryBind.InitIncoding)
+              .Do()
+              .AjaxGet(Url.Action("FetchComplex", "Data"))
+              .OnSuccess(dsl =>
+                             {
+                                 dsl.WithId(newsContainerId).Core().Insert.For<ComplexVm>(r => r.News).WithTemplateByUrl(Url.Dispatcher().AsView("~/Views/Template/Table_News_Tmpl.cshtml")).Html();
+
+                                 string asTmpl = Url.Dispatcher()
+                                                    .Model(new TableContactTmpl())
+                                                    .AsView("~/Views/Template/Table_Contact_Tmpl.cshtml");
+                                 dsl.WithId(contactContainerId).Core().Insert.For<ComplexVm>(r => r.Contacts).WithTemplateByUrl(asTmpl).Html();
+                             })
+              .AsHtmlAttributes()
+              .ToDiv())
+        <div class="row">
+            <div class="col-lg-4" id="@newsContainerId">
+                
+            </div>
+            <div class="col-lg-4" id="@contactContainerId"></div>
+        </div>
+    </div>
+
+</div>
