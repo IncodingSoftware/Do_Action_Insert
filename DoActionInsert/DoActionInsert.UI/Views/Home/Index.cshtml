@@ -15,7 +15,8 @@
               .OnSuccess(dsl => dsl.Self().Core().Insert.Html())
               .AsHtmlAttributes()
               .ToDiv())                    
-    </div>      
+    </div>   
+    
     <div>
         <h3>Action ajax</h3>            
         @(Html.When(JqueryBind.InitIncoding)
@@ -29,7 +30,63 @@
               .AsHtmlAttributes()
               .ToDiv())                    
     </div>
+    <div>
+        <h3>Submit ( bind on form )</h3>            
+        @{
+            string submitOnFormResultId = Guid.NewGuid().ToString();
+        }
+        @using (Html.When(JqueryBind.Submit)
+                    .DoWithPreventDefault()
+                    .Submit()
+                    .OnSuccess(dsl => dsl.WithId(submitOnFormResultId).Core().Insert.Html())
+                    .AsHtmlAttributes(new { action = Url.Action("PostContact", "Data"), method = "POST" })
+                    .ToBeginTag(Html, HtmlTag.Form))
+        {
+            <div class="form-group">
+                <label class="col-sm-2 control-label">First</label>
+                <input type="text" name="First"/>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Last</label>
+                <input type="text" name="Last"/>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">City</label>
+                <input type="text" name="City"/>
+            </div>
+            <input type="submit" value="Post"/>
+            <div id="@submitOnFormResultId"></div>
+        }
+    </div>  
 
+    <div>
+        <h3>Submit ( bind on input )</h3>            
+        @{
+            string submitOnInputId = Guid.NewGuid().ToString();
+        }
+        @using (Html.BeginForm("PostContact", "Data"))
+        {
+            <div class="form-group">
+                <label class="col-sm-2 control-label">First</label>
+                <input type="text" name="First"/>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Last</label>
+                <input type="text" name="Last"/>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">City</label>
+                <input type="text" name="City"/>
+            </div>
+            @(Html.When(JqueryBind.Click)
+                  .DoWithPreventDefault()
+                  .SubmitOn(selector => selector.Self().Closest(HtmlTag.Form))
+                  .OnSuccess(dsl => dsl.WithId(submitOnInputId).Core().Insert.Html())
+                  .AsHtmlAttributes()
+                  .ToInput(HtmlInputType.Submit, "Post"))
+            <div id="@submitOnInputId"></div>
+        }
+    </div>  
     <div>
         <h3>Generic insert</h3>    
         <div class="row">
@@ -74,10 +131,62 @@
               .AsHtmlAttributes()
               .ToDiv())
         <div class="row">
-            <div class="col-lg-4" id="@newsContainerId">
-                
+            <div class="col-lg-4" id="@newsContainerId">                
             </div>
             <div class="col-lg-4" id="@contactContainerId"></div>
+        </div>
+    </div>
+    <div>
+        <h3>Evetns</h3>    
+        @{
+            string eventContainerId = Guid.NewGuid().ToString();
+        }
+        @(Html.When(JqueryBind.InitIncoding)
+              .Do()
+              .AjaxGet(Url.Action("Contact", "Data"))
+              .OnSuccess(dsl => dsl.WithId(eventContainerId).Core().Trigger.Incoding())
+              .AsHtmlAttributes()
+              .ToDiv())
+        <div class="row">
+            @(Html.When(JqueryBind.None)
+                  .Do()
+                  .Event()
+                  .OnSuccess(dsl => dsl.Self().Core().Insert.Html())
+                  .AsHtmlAttributes(new { id = eventContainerId })
+                  .ToDiv())
+        </div>
+    </div>
+    <div>
+        <h3>Evetns ( with where )</h3>    
+      
+        @(Html.When(JqueryBind.InitIncoding)
+              .Do()
+              .AjaxGet(Url.Action("FetchContacts", "Data"))
+              .OnSuccess(dsl => dsl.WithClass("window").Core().Trigger.Incoding())
+              .AsHtmlAttributes()
+              .ToDiv())
+        <div class="row">
+            @{
+             Func<string, MvcHtmlString> createWindow = (id) =>
+               {
+                   return Html.When(JqueryBind.None)
+                              .Do()
+                              .Event()
+                              .Where<ContactVm>(r => r.Id == id)
+                              .OnSuccess(dsl =>
+                                             {
+                                                 string urlTemplate = Url.Dispatcher().Model(new TableContactTmpl { IsShowInfo = false })
+                                                                         .AsView("~/Views/Template/Table_Contact_Tmpl.cshtml");
+                                                 dsl.Self().Core().Insert.WithTemplateByUrl(urlTemplate).Html();
+                                             })
+                              .AsHtmlAttributes(new { @class="window col-lg-2" })
+                              .ToDiv();
+               };
+            }
+            @createWindow("1")
+            @createWindow("2")
+            @createWindow("3")
+            @createWindow("4")
         </div>
     </div>
 

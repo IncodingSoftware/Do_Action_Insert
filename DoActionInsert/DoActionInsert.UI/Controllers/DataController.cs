@@ -60,5 +60,11 @@
                                new ContactVm { Id = "4", First = "Victor", Last = "Karpatovv", City = "St" }
                        };
         }
+
+        [HttpPost]
+        public ActionResult PostContact(ContactVm contactVm)
+        {
+            return IncView(contactVm);
+        }
     }
 }

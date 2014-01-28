@@ -192,6 +192,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Template\Table_News_Tmpl.cshtml" />
     <Content Include="Views\Data\Contact.cshtml" />
+    <Content Include="Views\Data\PostContact.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
