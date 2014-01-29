@@ -17,21 +17,20 @@
 
         [HttpGet]
         public ActionResult Contact()
-        {            
+        {
             return IncView(GetContacts().FirstOrDefault());
         }
-
 
         [HttpGet]
         public ActionResult FetchComplex()
         {
             return IncJson(new ComplexVm
                                {
-                                       Contacts = GetContacts(),
+                                       Contacts = GetContacts(), 
                                        News = new List<NewsVm>
                                                   {
-                                                          new NewsVm { CreateDt = DateTime.Now.AddDays(-5).ToShortDateString(), Content = "Old news" },
-                                                          new NewsVm { CreateDt = DateTime.Now.AddDays(5).ToShortDateString(), Content = "Future news" },
+                                                          new NewsVm { CreateDt = DateTime.Now.AddDays(-5).ToShortDateString(), Content = "Old news" }, 
+                                                          new NewsVm { CreateDt = DateTime.Now.AddDays(5).ToShortDateString(), Content = "Future news" }, 
                                                   }
                                });
         }
@@ -48,23 +47,29 @@
             return IncJson(GetContacts());
         }
 
+        [HttpPost]
+        public ActionResult PostContact(ContactVm contactVm)
+        {
+            return IncView(contactVm);
+        }
+
+        [HttpGet]
+        public ActionResult RedirectTo(string url)
+        {
+            return IncRedirect(url);
+        }
+
         #endregion
 
         static List<ContactVm> GetContacts()
         {
             return new List<ContactVm>
                        {
-                               new ContactVm { Id = "1", First = "Vlad", Last = "Popov", City = "Taganrog" },
-                               new ContactVm { Id = "2", First = "Gena", Last = "Ivanov", City = "Rostov" },
-                               new ContactVm { Id = "3", First = "Anton", Last = "Belov", City = "St" },
+                               new ContactVm { Id = "1", First = "Vlad", Last = "Popov", City = "Taganrog" }, 
+                               new ContactVm { Id = "2", First = "Gena", Last = "Ivanov", City = "Rostov" }, 
+                               new ContactVm { Id = "3", First = "Anton", Last = "Belov", City = "St" }, 
                                new ContactVm { Id = "4", First = "Victor", Last = "Karpatovv", City = "St" }
                        };
-        }
-
-        [HttpPost]
-        public ActionResult PostContact(ContactVm contactVm)
-        {
-            return IncView(contactVm);
         }
     }
 }

@@ -15,6 +15,19 @@
               .OnSuccess(dsl => dsl.Self().Core().Insert.Html())
               .AsHtmlAttributes()
               .ToDiv())                    
+    </div>  
+    
+    <div>
+        <h3>Redirect to</h3>            
+        @{ string inputUrlName = Guid.NewGuid().ToString();}
+        <label>url to</label>
+        @Html.TextBox(inputUrlName)
+
+        @(Html.When(JqueryBind.Click)
+              .Do()
+              .AjaxGet(Url.Action("RedirectTo", "Data", new { Url = Selector.Jquery.Name(inputUrlName) }))
+              .AsHtmlAttributes()
+              .ToButton("Redirect"))                    
     </div>   
     
     <div>
@@ -167,21 +180,21 @@
               .ToDiv())
         <div class="row">
             @{
-             Func<string, MvcHtmlString> createWindow = (id) =>
-               {
-                   return Html.When(JqueryBind.None)
-                              .Do()
-                              .Event()
-                              .Where<ContactVm>(r => r.Id == id)
-                              .OnSuccess(dsl =>
-                                             {
-                                                 string urlTemplate = Url.Dispatcher().Model(new TableContactTmpl { IsShowInfo = false })
-                                                                         .AsView("~/Views/Template/Table_Contact_Tmpl.cshtml");
-                                                 dsl.Self().Core().Insert.WithTemplateByUrl(urlTemplate).Html();
-                                             })
-                              .AsHtmlAttributes(new { @class="window col-lg-2" })
-                              .ToDiv();
-               };
+                Func<string, MvcHtmlString> createWindow = (id) =>
+                                                               {
+                                                                   return Html.When(JqueryBind.None)
+                                                                              .Do()
+                                                                              .Event()
+                                                                              .Where<ContactVm>(r => r.Id == id)
+                                                                              .OnSuccess(dsl =>
+                                                                                             {
+                                                                                                 string urlTemplate = Url.Dispatcher().Model(new TableContactTmpl { IsShowInfo = false })
+                                                                                                                         .AsView("~/Views/Template/Table_Contact_Tmpl.cshtml");
+                                                                                                 dsl.Self().Core().Insert.WithTemplateByUrl(urlTemplate).Html();
+                                                                                             })
+                                                                              .AsHtmlAttributes(new { @class="window col-lg-2" })
+                                                                              .ToDiv();
+                                                               };
             }
             @createWindow("1")
             @createWindow("2")
@@ -191,3 +204,4 @@
     </div>
 
 </div>
+
